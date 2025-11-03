@@ -48,10 +48,24 @@
           s.src="https://scripts.converteai.net/db414655-3f62-4b58-9a37-04bec9afa745/players/690508976ae4034e480581be/v4/player.js",
           s.async=!0,document.head.appendChild(s);
         </script>
+
+        <!-- Contador de Espectadores - SEMPRE VISÍVEL -->
+        <div class="flex items-center justify-center gap-2 rounded-lg bg-gray-100 border border-gray-300 px-4 py-2.5 shadow-sm">
+          <div class="flex items-center gap-2">
+            <svg class="h-5 w-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+              <circle cx="10" cy="10" r="3" fill="currentColor">
+                <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+              </circle>
+            </svg>
+            <span class="text-sm font-semibold text-gray-700">
+              <span id="viewer-count" class="font-bold text-gray-900">402</span> Zuschauer gerade online
+            </span>
+          </div>
+        </div>
       </section>
 
       <!-- CTA Header com Contador - HIDDEN (aparece depois do gate) -->
-      <section id="gated-content" data-gate="3453" class="hidden">
+      <section id="gated-content" data-gate="2544" class="hidden">
         <div class="rounded-2xl bg-gradient-to-r from-amber-800 via-amber-700 to-amber-800 p-6 text-center shadow-2xl fade-in">
           <h2 class="mb-3 text-2xl font-extrabold text-white md:text-3xl">
             Wählen Sie Ihr rabattiertes Gingerfit-Paket mit unserem zeitlich begrenzten Sonderangebot!
@@ -771,6 +785,94 @@
         </div>
       </div>
     </section>
+
+    <!-- Script de Contador de Espectadores -->
+    <script>
+    !function() {
+      let currentViewers = 402;
+      let targetViewers = 402;
+      let lastUpdateTime = 0;
+
+      // Função para calcular o número alvo baseado no tempo do vídeo
+      function getTargetViewers(videoTime) {
+        if (videoTime < 1200) { // 0 a 20 minutos
+          // Interpolar entre 402 e 648
+          return Math.floor(402 + (videoTime / 1200) * (648 - 402));
+        } else if (videoTime < 2544) { // 20 minutos a 42:24
+          // Interpolar entre 648 e 894
+          return Math.floor(648 + ((videoTime - 1200) / (2544 - 1200)) * (894 - 648));
+        } else { // Após 42:24
+          // Variar entre 894 e 966
+          return Math.floor(894 + Math.random() * (966 - 894));
+        }
+      }
+
+      // Função para atualizar o contador com variação natural
+      function updateViewerCount(videoTime) {
+        const now = Date.now();
+
+        // Atualizar a cada 5-15 segundos
+        if (now - lastUpdateTime < 5000 + Math.random() * 10000) {
+          return;
+        }
+
+        lastUpdateTime = now;
+        targetViewers = getTargetViewers(videoTime);
+
+        // Adicionar variação aleatória (-5 a +10)
+        // 75% de chance de aumentar, 25% de diminuir
+        const variation = Math.random() < 0.75
+          ? Math.floor(Math.random() * 10) + 1
+          : -Math.floor(Math.random() * 5);
+
+        let newViewers = currentViewers + variation;
+
+        // Garantir que não ultrapasse os limites
+        const minViewers = Math.max(402, targetViewers - 30);
+        const maxViewers = Math.min(966, targetViewers + 30);
+        newViewers = Math.max(minViewers, Math.min(maxViewers, newViewers));
+
+        // Animar a mudança do número
+        if (newViewers !== currentViewers) {
+          currentViewers = newViewers;
+          const element = document.getElementById('viewer-count');
+          if (element) {
+            element.style.transition = 'opacity 0.3s';
+            element.style.opacity = '0.4';
+
+            setTimeout(() => {
+              element.textContent = currentViewers;
+              element.style.opacity = '1';
+            }, 300);
+          }
+        }
+      }
+
+      // Inicializar quando o player estiver pronto
+      function initViewerCounter(attempt = 0) {
+        const player = window.smartplayer?.instances?.[0];
+        if (!player) {
+          if (attempt < 40) {
+            setTimeout(() => initViewerCounter(attempt + 1), 250);
+          }
+          return;
+        }
+
+        const updateHandler = () => {
+          const currentTime = player.video?.currentTime || 0;
+          updateViewerCount(currentTime);
+        };
+
+        player.on('timeupdate', updateHandler);
+        player.on('play', updateHandler);
+
+        // Atualizar imediatamente
+        updateHandler();
+      }
+
+      initViewerCounter();
+    }();
+    </script>
 
     <!-- Script de Gates -->
     <script>!function(){const t=Array.from(document.querySelectorAll("[data-gate]")).map(t=>({el:t,at:Number(t.dataset.gate)||0,shown:!1})).sort((t,e)=>t.at-e.at);function e(e){for(const n of t)!n.shown&&e>=n.at&&(n.el.classList.remove("hidden"),n.shown=!0)}function n(t=0){const s=window.smartplayer?.instances?.[0];if(!s)return void(t<40&&setTimeout(()=>n(t+1),250));const a=()=>e(s.video?.currentTime||0);s.on("timeupdate",a),s.on("seeking",a),s.on("play",a),a()}t.forEach(t=>t.el.classList.add("hidden")),n(),window.gateReport=function(t){e(Number(t)||0)}}();</script>
