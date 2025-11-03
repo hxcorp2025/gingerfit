@@ -362,23 +362,16 @@
               
               <div class="space-y-4 text-gray-800">
                 <p class="leading-relaxed">
-                  <strong>Wir sind so überzeugt, dass Gingerfit Ihnen bemerkenswerte Ergebnisse liefert, dass wir das gesamte Risiko mit unserer exklusiven 60-Tage-„Schlank & Fit"-Garantie übernehmen.</strong>
+                  <strong>Wir sind so überzeugt, dass Gingerfit Ihnen bemerkenswarte Ergebnisse liefert, dass wir das gesamte Risiko mit unserer exklusiven 60-Tage-„Schlank & Fit"-Garantie übernehmen.</strong>
                 </p>
-                
+
                 <p class="leading-relaxed">
                   <strong>Sobald Ihre Bestellung eintrifft, beginnen Sie täglich Gingerfit einzunehmen und beobachten Sie, wie Ihr Körper reagiert. Bereits nach wenigen Tagen könnten Sie mehr Energie, weniger Blähungen und ein müheloses Hungergefühl bemerken. Bleiben Sie einige Wochen oder Monate dabei, und Sie könnten eine dramatische Veränderung sehen — hartnäckiges Fett schmilzt, Ihre Taille wird schlanker und Ihre Gesundheit, Ihr Selbstvertrauen und Ihr Wohlbefinden verbessern sich.</strong>
                 </p>
-                
+
                 <p class="leading-relaxed">
                   <strong>Und falls Sie in diesen 60 Tagen das Gefühl haben, dass Gingerfit nicht hält, was wir versprochen haben — wenn das Gewicht nicht wie erwartet schwindet oder Sie einfach nicht zufrieden sind — kontaktieren Sie uns. Wir erstatten jeden Cent zurück, ohne Fragen. Sie müssen die Dose nicht einmal zurücksenden — Sie dürfen sie komplett kostenlos behalten, als Geschenk für den Versuch von Gingerfit.</strong>
                 </p>
-              </div>
-
-              <div class="mt-6 flex flex-wrap items-center justify-center gap-4 md:justify-start">
-                <img src="https://gingerfit.site/wp-content/uploads/2025/09/gmp.webp" width="64" height="64" loading="lazy" alt="GMP" class="h-16 drop-shadow-md">
-                <img src="https://gingerfit.site/wp-content/uploads/2025/09/nat.webp" width="64" height="64" loading="lazy" alt="Natural" class="h-16 drop-shadow-md">
-                <img src="https://gingerfit.site/wp-content/uploads/2025/09/foreign.webp" width="64" height="64" loading="lazy" alt="Foreign" class="h-16 drop-shadow-md">
-                <img src="https://gingerfit.site/wp-content/uploads/2025/09/gmo.webp" width="64" height="64" loading="lazy" alt="Non-GMO" class="h-16 drop-shadow-md">
               </div>
             </div>
 
@@ -657,31 +650,6 @@
                   </div>
                   <span class="text-xs text-gray-600 ml-1">18</span>
                 </div>
-
-                <!-- Resposta aninhada -->
-                <div class="mt-3 flex gap-3 pl-8">
-                  <img
-                    src="https://healthy-future.site/vsl-wgv/img/profiles/woman_7.webp"
-                    width="32"
-                    height="32"
-                    loading="lazy"
-                    alt="Nome"
-                    class="h-8 w-8 flex-shrink-0 rounded-full object-cover"
-                  />
-                  <div class="flex-1">
-                    <div class="rounded-2xl bg-gray-100 px-4 py-2">
-                      <div class="mb-1 font-semibold text-gray-900 text-sm">Nome</div>
-                      <div class="text-[14px] leading-relaxed text-gray-800">
-                        Resposta...
-                      </div>
-                    </div>
-                    <div class="mt-1 flex items-center gap-3 pl-4 text-xs text-gray-600">
-                      <button class="font-semibold hover:underline">Gefällen</button>
-                      <button class="font-semibold hover:underline">Kommentar</button>
-                      <span>15 · 1 h</span>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -884,7 +852,91 @@
     }();
     </script>
 
-    <!-- Script de Gates -->
-    <script>!function(){const t=Array.from(document.querySelectorAll("[data-gate]")).map(t=>({el:t,at:Number(t.dataset.gate)||0,shown:!1})).sort((t,e)=>t.at-e.at);function e(e){for(const n of t)!n.shown&&e>=n.at&&(n.el.classList.remove("hidden"),n.shown=!0)}function n(t=0){const s=window.smartplayer?.instances?.[0];if(!s)return void(t<40&&setTimeout(()=>n(t+1),250));const a=()=>e(s.video?.currentTime||0);s.on("timeupdate",a),s.on("seeking",a),s.on("play",a),a()}t.forEach(t=>t.el.classList.add("hidden")),n(),window.gateReport=function(t){e(Number(t)||0)}}();</script>
+    <!-- Script de Gates com Persistência -->
+    <script>
+    !function() {
+      const STORAGE_KEY = 'gingerfit_content_unlocked';
+      const gates = Array.from(document.querySelectorAll("[data-gate]"))
+        .map(el => ({
+          el: el,
+          at: Number(el.dataset.gate) || 0,
+          shown: false
+        }))
+        .sort((a, b) => a.at - b.at);
+
+      // Função para revelar conteúdo
+      function revealContent(currentTime) {
+        let contentWasRevealed = false;
+
+        for (const gate of gates) {
+          if (!gate.shown && currentTime >= gate.at) {
+            gate.el.classList.remove("hidden");
+            gate.shown = true;
+            contentWasRevealed = true;
+          }
+        }
+
+        // Salvar no localStorage quando o conteúdo for revelado
+        if (contentWasRevealed && currentTime >= 2544) {
+          try {
+            localStorage.setItem(STORAGE_KEY, 'true');
+          } catch (e) {
+            // Ignorar erros de localStorage (modo privado, etc)
+          }
+        }
+      }
+
+      // Verificar se conteúdo já foi desbloqueado anteriormente
+      function checkUnlockedContent() {
+        try {
+          if (localStorage.getItem(STORAGE_KEY) === 'true') {
+            // Revelar todo o conteúdo imediatamente
+            gates.forEach(gate => {
+              gate.el.classList.remove("hidden");
+              gate.shown = true;
+            });
+            return true;
+          }
+        } catch (e) {
+          // Ignorar erros de localStorage
+        }
+        return false;
+      }
+
+      // Inicializar o sistema de gates
+      function initGates(attempt = 0) {
+        const player = window.smartplayer?.instances?.[0];
+
+        if (!player) {
+          if (attempt < 40) {
+            setTimeout(() => initGates(attempt + 1), 250);
+          }
+          return;
+        }
+
+        const updateHandler = () => revealContent(player.video?.currentTime || 0);
+
+        player.on('timeupdate', updateHandler);
+        player.on('seeking', updateHandler);
+        player.on('play', updateHandler);
+
+        updateHandler();
+      }
+
+      // Esconder gates inicialmente (se não estiver desbloqueado)
+      gates.forEach(gate => gate.el.classList.add("hidden"));
+
+      // Verificar se já foi desbloqueado
+      if (!checkUnlockedContent()) {
+        // Se não foi desbloqueado, iniciar sistema de gates normal
+        initGates();
+      }
+
+      // Função global para reportar progresso
+      window.gateReport = function(time) {
+        revealContent(Number(time) || 0);
+      };
+    }();
+    </script>
   </body>
 </html>
