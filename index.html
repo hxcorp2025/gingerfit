@@ -987,6 +987,14 @@
           const eventSourceUrl = window.location.href;
           const userAgent = navigator.userAgent;
 
+          // Coletar UTMs
+          const utmSource = getURLParameter('utm_source');
+          const utmMedium = getURLParameter('utm_medium');
+          const utmCampaign = getURLParameter('utm_campaign');
+          const utmContent = getURLParameter('utm_content');
+          const utmTerm = getURLParameter('utm_term');
+          const utmId = getURLParameter('utm_id');
+
           // 1. Enviar para Meta Pixel (se disponível)
           if (typeof fbq === 'function') {
             fbq('track', 'InitiateCheckout', {}, { eventID: eventId });
@@ -999,7 +1007,13 @@
             fbp: fbp,
             fbclid: fbclid,
             event_source_url: eventSourceUrl,
-            user_agent: userAgent
+            user_agent: userAgent,
+            utm_source: utmSource,
+            utm_medium: utmMedium,
+            utm_campaign: utmCampaign,
+            utm_content: utmContent,
+            utm_term: utmTerm,
+            utm_id: utmId
           };
 
           fetch(WEBHOOK_URL, {
