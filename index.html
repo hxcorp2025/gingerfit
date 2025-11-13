@@ -947,5 +947,97 @@
       };
     }();
     </script>
+
+    <!-- Script de InitiateCheckout para Meta Pixel + Webhook N8N -->
+    <script>
+    !function() {
+      const PIXEL_ID = '1433713427644133';
+      const WEBHOOK_URL = 'https://n8n-n8n.sf6dqo.easypanel.host/webhook/gingerfit';
+      const SESSION_KEY = 'checkout_event_sent';
+
+      // Função para ler cookie
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+      }
+
+      // Função para pegar parâmetro da URL
+      function getURLParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+      }
+
+      // Função para enviar evento
+      function sendInitiateCheckout() {
+        // Verificar se já enviou nesta sessão
+        if (sessionStorage.getItem(SESSION_KEY) === 'true') {
+          return;
+        }
+
+        try {
+          // Gerar event_id único
+          const eventId = crypto.randomUUID();
+
+          // Coletar dados
+          const eventTime = Math.floor(Date.now() / 1000); // Unix timestamp em segundos
+          const fbp = getCookie('_fbp');
+          const fbclid = getURLParameter('fbclid');
+          const eventSourceUrl = window.location.href;
+          const userAgent = navigator.userAgent;
+
+          // 1. Enviar para Meta Pixel (se disponível)
+          if (typeof fbq === 'function') {
+            fbq('track', 'InitiateCheckout', {}, { eventID: eventId });
+          }
+
+          // 2. Enviar para webhook N8N
+          const payload = {
+            event_id: eventId,
+            event_time: eventTime,
+            fbp: fbp,
+            fbclid: fbclid,
+            event_source_url: eventSourceUrl,
+            user_agent: userAgent
+          };
+
+          fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload),
+            keepalive: true // Garante envio mesmo se usuário sair da página
+          }).catch(function(error) {
+            // Ignorar erros silenciosamente para não afetar UX
+            console.error('Webhook error:', error);
+          });
+
+          // Marcar como enviado nesta sessão
+          sessionStorage.setItem(SESSION_KEY, 'true');
+
+        } catch (error) {
+          console.error('InitiateCheckout error:', error);
+        }
+      }
+
+      // Adicionar event listener em todos os botões de checkout
+      function initCheckoutTracking() {
+        const checkoutButtons = document.querySelectorAll('a[href*="checkout-ds24.com"]');
+
+        checkoutButtons.forEach(function(button) {
+          button.addEventListener('click', sendInitiateCheckout, { once: false });
+        });
+      }
+
+      // Inicializar quando DOM estiver pronto
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCheckoutTracking);
+      } else {
+        initCheckoutTracking();
+      }
+    }();
+    </script>
   </body>
 </html>
